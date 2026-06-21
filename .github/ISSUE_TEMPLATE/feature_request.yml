@@ -3,6 +3,13 @@ description: Suggest an improvement
 title: "[Feature]: "
 labels: ["enhancement"]
 body:
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Pre-checks
+      options:
+        - label: I searched existing issues and discussions.
+          required: true
   - type: textarea
     id: problem
     attributes:
@@ -22,4 +29,8 @@ body:
     attributes:
       label: Alternatives
       description: Any alternatives or tradeoffs considered?
-
+  - type: textarea
+    id: examples
+    attributes:
+      label: Examples
+      description: Include sample commands, folder layouts, or expected output if useful.
