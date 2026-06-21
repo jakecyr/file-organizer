@@ -2,7 +2,7 @@ name: CI
 
 on:
   push:
-    branches: ["main"]
+    branches: ["master", "main"]
   pull_request:
 
 jobs:
@@ -31,4 +31,3 @@ jobs:
 
       - name: Test
         run: uv run pytest
-
