@@ -18,6 +18,57 @@ IMAGE_EXTENSIONS = {
     ".webp",
 }
 
+DOCUMENT_EXTENSIONS = {
+    ".doc",
+    ".docx",
+    ".odp",
+    ".ods",
+    ".odt",
+    ".pages",
+    ".pdf",
+    ".ppt",
+    ".pptx",
+    ".rtf",
+}
+
+SPREADSHEET_EXTENSIONS = {
+    ".xls",
+    ".xlsm",
+    ".xlsx",
+}
+
+ARCHIVE_EXTENSIONS = {
+    ".7z",
+    ".gz",
+    ".rar",
+    ".tar",
+    ".tgz",
+    ".zip",
+}
+
+CERTIFICATE_EXTENSIONS = {
+    ".cer",
+    ".crt",
+    ".der",
+    ".p12",
+    ".p8",
+    ".pem",
+}
+
+PROVISIONING_EXTENSIONS = {
+    ".mobileprovision",
+    ".provisionprofile",
+}
+
+DIAGRAM_EXTENSIONS = {
+    ".excalidraw",
+    ".svg",
+}
+
+CONFIG_EXTENSIONS = {
+    ".plist",
+}
+
 TEXT_EXTENSIONS = {
     ".cfg",
     ".conf",
@@ -77,6 +128,20 @@ def classify_file(path: Path) -> str:
     suffix = path.suffix.lower()
     if suffix in IMAGE_EXTENSIONS:
         return "image"
+    if suffix in DOCUMENT_EXTENSIONS:
+        return "document"
+    if suffix in SPREADSHEET_EXTENSIONS:
+        return "spreadsheet"
+    if suffix in ARCHIVE_EXTENSIONS:
+        return "archive"
+    if suffix in CERTIFICATE_EXTENSIONS:
+        return "certificate"
+    if suffix in PROVISIONING_EXTENSIONS:
+        return "provisioning"
+    if suffix in DIAGRAM_EXTENSIONS:
+        return "diagram"
+    if suffix in CONFIG_EXTENSIONS:
+        return "config"
     if suffix in TEXT_EXTENSIONS:
         return "text"
     return "binary"
@@ -216,7 +281,13 @@ def metadata_text(
     if record.kind == "image" and image_caption:
         parts.append(f"Image description and visible text: {image_caption}")
     elif record.kind == "text":
+        if is_sensitive_text_file(record.path):
+            parts.append("Document head omitted: likely credential, secret, token, or config file.")
+            return "\n".join(parts)
         head = read_text_head(record.path, text_head_chars)
+        if looks_sensitive_text(head):
+            parts.append("Document head omitted: likely credential, secret, token, or config file.")
+            return "\n".join(parts)
         if head:
             parts.append(f"Document head: {head}")
     return "\n".join(parts)
@@ -226,3 +297,44 @@ def filename_keywords(path: Path) -> str:
     stem = path.stem.replace("_", " ").replace("-", " ")
     tokens = [match.group(0).lower() for match in re.finditer(r"[A-Za-z][A-Za-z0-9]+", stem)]
     return " ".join(tokens)
+
+
+def is_sensitive_text_file(path: Path) -> bool:
+    name = path.name.lower()
+    suffix = path.suffix.lower()
+    sensitive_suffixes = {
+        ".env",
+        ".key",
+    } | CERTIFICATE_EXTENSIONS | PROVISIONING_EXTENSIONS
+    if suffix in sensitive_suffixes:
+        return True
+    sensitive_markers = {
+        "apikey",
+        "api-key",
+        "authkey",
+        "credential",
+        "firebase-adminsdk",
+        "googleservice-info",
+        "private-key",
+        "secret",
+        "service-account",
+        "subscriptionkey",
+        "token",
+    }
+    return any(marker in name for marker in sensitive_markers)
+
+
+def looks_sensitive_text(text: str) -> bool:
+    lowered = text.lower()
+    sensitive_markers = {
+        "-----begin private key-----",
+        "api_key",
+        "apikey",
+        "auth_token",
+        "client_x509_cert_url",
+        "private_key",
+        "private_key_id",
+        "refresh_token",
+        "service_account",
+    }
+    return any(marker in lowered for marker in sensitive_markers)

@@ -5,9 +5,12 @@ Local-first CLI for organizing loose files into folders with Ollama embeddings, 
 Commands:
 
 ```bash
+fo
 file-organizer ~/Downloads
 fo ~/Downloads
 ```
+
+When no folder is provided, `fo` organizes the current working directory.
 
 By default, `fo` prints a plan and asks for confirmation before moving files. Use `--dry-run` when you only want to preview.
 
@@ -60,10 +63,13 @@ export PATH="$HOME/.local/bin:$PATH"
 Preview an organization plan without moving files:
 
 ```bash
+fo --dry-run
 fo ~/Downloads --dry-run
 ```
 
 By default, `fo` only analyzes root-level files and top-level folder names. It does not inspect every file inside existing subfolders.
+
+When several loose files share a project, client, app, or brand name, `fo` groups those together before falling back to generic type folders like `Documents`, `Screenshots`, `Financial Records`, or `Developer Credentials`.
 
 Move files after confirmation:
 

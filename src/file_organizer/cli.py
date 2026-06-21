@@ -13,8 +13,11 @@ from file_organizer.cluster import (
     Assignment,
     EnrichedFile,
     assign_to_existing_folder,
+    assign_to_repeated_entity_groups,
     build_folder_profiles,
     cluster_unassigned,
+    suggest_folder_name,
+    unique_name,
 )
 from file_organizer.config import UnmatchedPolicy, load_settings
 from file_organizer.models import OllamaModels
@@ -29,14 +32,14 @@ from file_organizer.scanner import (
 
 app = typer.Typer(
     help="Organize a folder using local Ollama embeddings and image understanding.",
-    no_args_is_help=True,
+    no_args_is_help=False,
 )
 console = Console()
 
 
 @app.command()
 def organize(
-    folder: Annotated[Path, typer.Argument(help="Folder to organize.")],
+    folder: Annotated[Path, typer.Argument(help="Folder to organize.")] = Path("."),
     dry_run: Annotated[
         bool, typer.Option("--dry-run", help="Only print the organization plan. Do not move files.")
     ] = False,
@@ -197,15 +200,38 @@ def organize(
         else:
             unassigned.append(file)
 
-    clusterable = [file for file in unassigned if file.record.kind != "binary"]
-    unmatched = [file for file in unassigned if file.record.kind == "binary"]
+    used_folder_names = set(profiles)
+    entity_assignments, unassigned, used_folder_names = assign_to_repeated_entity_groups(
+        unassigned,
+        existing_names=used_folder_names,
+    )
+    assignments.extend(entity_assignments)
+
+    rule_unassigned: list[EnrichedFile] = []
+    for file in unassigned:
+        suggested_folder = suggest_folder_name(file)
+        if suggested_folder is None:
+            rule_unassigned.append(file)
+            continue
+        target_folder = unique_name(suggested_folder, used_folder_names)
+        used_folder_names.add(target_folder)
+        assignments.append(
+            Assignment(
+                file=file,
+                target_folder=target_folder,
+                reason="filename/type rule",
+            )
+        )
+
+    clusterable = [file for file in rule_unassigned if file.record.kind != "binary"]
+    unmatched = [file for file in rule_unassigned if file.record.kind == "binary"]
 
     new_assignments, still_unmatched = cluster_unassigned(
         clusterable,
         threshold=settings.new_cluster_threshold,
         min_cluster_size=settings.min_cluster_size,
         allow_singletons=allow_singleton_clusters,
-        existing_names=set(profiles),
+        existing_names=used_folder_names,
         model_namer=models if settings.naming_model else None,
     )
     assignments.extend(new_assignments)
