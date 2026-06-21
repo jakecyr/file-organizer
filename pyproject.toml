@@ -12,7 +12,7 @@ dependencies = [
   "numpy>=1.26",
   "ollama>=0.3.0",
   "pydantic-settings>=2.3",
-  "python-dotenv>=1.0",
+  "python-dotenv>=1.2.2",
   "rich>=13.7",
   "typer>=0.12",
 ]
