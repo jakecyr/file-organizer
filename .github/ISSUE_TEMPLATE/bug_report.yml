@@ -6,6 +6,15 @@ body:
   - type: markdown
     attributes:
       value: Thanks for reporting a bug. Please include enough detail to reproduce it.
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Pre-checks
+      options:
+        - label: I searched existing issues and discussions.
+          required: true
+        - label: I can reproduce this with the latest version or current `master`.
+          required: true
   - type: textarea
     id: what-happened
     attributes:
@@ -23,6 +32,12 @@ body:
     validations:
       required: true
   - type: input
+    id: command
+    attributes:
+      label: Command
+      description: Paste the exact command you ran, redacting private paths if needed.
+      placeholder: fo ~/Downloads --dry-run
+  - type: input
     id: version
     attributes:
       label: Version or commit
@@ -38,4 +53,11 @@ body:
         uv:
         Ollama:
         Models:
-
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs or output
+      description: Paste relevant terminal output. Redact private paths, filenames, or secrets.
+      render: text

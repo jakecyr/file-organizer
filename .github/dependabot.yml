@@ -4,9 +4,16 @@ updates:
     directory: "/"
     schedule:
       interval: "weekly"
+    labels:
+      - "dependencies"
+      - "github_actions"
+    open-pull-requests-limit: 5
 
   - package-ecosystem: "pip"
     directory: "/"
     schedule:
       interval: "weekly"
-
+    labels:
+      - "dependencies"
+      - "python"
+    open-pull-requests-limit: 5

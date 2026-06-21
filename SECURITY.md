@@ -15,3 +15,10 @@ Include:
 
 The maintainer will acknowledge valid reports and coordinate a fix before public disclosure when appropriate.
 
+## Supported Versions
+
+Security fixes are handled on the default branch until the project starts publishing versioned releases.
+
+## Scope
+
+Please include issues that could move, expose, or corrupt local files unexpectedly, leak private paths or filenames, or run commands outside the documented CLI behavior.
