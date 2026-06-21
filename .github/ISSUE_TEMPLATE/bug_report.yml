@@ -1,0 +1,41 @@
+name: Bug report
+description: Report a reproducible problem
+title: "[Bug]: "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: Thanks for reporting a bug. Please include enough detail to reproduce it.
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened?
+      description: Describe the problem and expected behavior.
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Reproduction steps
+      placeholder: |
+        1. Run `fo ...`
+        2. See ...
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Version or commit
+      description: Paste `fo --help` version output if available, or the commit SHA.
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      description: OS, Python version, uv version, Ollama version, and model names.
+      placeholder: |
+        OS:
+        Python:
+        uv:
+        Ollama:
+        Models:
+

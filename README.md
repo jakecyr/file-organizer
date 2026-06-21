@@ -134,3 +134,7 @@ uv run ruff check .
 uv run pytest
 uv run file-organizer --help
 ```
+
+## License
+
+MIT
