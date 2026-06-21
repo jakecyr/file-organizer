@@ -1,0 +1,38 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "file-organizer"
+version = "0.1.0"
+description = "Local-first CLI that uses Ollama embeddings and vision captions to organize files."
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+  "numpy>=1.26",
+  "ollama>=0.3.0",
+  "pydantic-settings>=2.3",
+  "python-dotenv>=1.0",
+  "rich>=13.7",
+  "typer>=0.12",
+]
+
+[dependency-groups]
+dev = [
+  "pytest>=8.0",
+  "ruff>=0.5",
+]
+
+[project.scripts]
+file-organizer = "file_organizer.cli:app"
+fo = "file_organizer.cli:app"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/file_organizer"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]
